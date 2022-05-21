@@ -27,7 +27,7 @@ StdioDevice Serial;    // output to screen
 HardwareImpl Hardware; // implementation for gpio, spi, i2c
 HardwareSetupImpl HardwareSetup; // setup for implementation
 #if PROVIDE_SERIALLIB    
-SerialImpl Serial1("/dev/ttyACM0");    // output to serial port
+SerialImpl Serial1("/dev/ttys005");    // output to serial port
 #endif
 
 

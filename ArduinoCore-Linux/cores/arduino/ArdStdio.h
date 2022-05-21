@@ -31,20 +31,24 @@ class StdioDevice : public Stream {
         if (auto_flush) flush();
     }
     
+    /*
     virtual void println(const char* str=""){
         std::cout << str << "\n";
         if (auto_flush) flush();
     }
+    */
     
     virtual void print(int str){
         std::cout << str;
         if (auto_flush) flush();
     }
     
+    /*
     virtual void println(int str){
         std::cout << str << "\n";
         if (auto_flush) flush();
     }
+    */
     
     virtual void println(String &str){
         println(str.c_str());
@@ -65,6 +69,9 @@ class StdioDevice : public Stream {
         p.printTo(*this);
         if (auto_flush) flush();
     }
+
+    using Print::print;
+    using Print::println;
     
     virtual void flush() {
         std::cout.flush();

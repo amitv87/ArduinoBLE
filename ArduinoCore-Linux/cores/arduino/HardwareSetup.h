@@ -80,7 +80,9 @@ class HardwareSetupImpl {
         void handShake(Stream* s) {
             while(true){
                 Logger.info( "HardwareSetup","waiting for device...");
+                /*
                 try {
+                */
                     // we wait for the Arduino to send us the Arduino-Emulator string
                     if (s->available()>=16){
                         char buffer[30];
@@ -94,9 +96,11 @@ class HardwareSetupImpl {
                         }
                     }    
                     delay(10000);
+                /*
                 } catch (const std::exception& e) { 
                     Logger.error("WiFiUDPStream", e.what());
                 }
+                */
             }
         }
 

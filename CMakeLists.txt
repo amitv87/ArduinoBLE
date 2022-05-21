@@ -1,3 +1,4 @@
+#[[
 # Works with 3.11 and tested through 3.19
 cmake_minimum_required(VERSION 3.11...3.19)
 
@@ -58,3 +59,51 @@ if(BUILD_HTTPS)
     # Add external libraries
     target_link_libraries(arduino_emulator wolfssl)
 endif(BUILD_HTTPS)
+]]
+
+cmake_minimum_required(VERSION 3.13)
+
+SET(CMAKE_C_LINK_FLAGS "")
+SET(CMAKE_CXX_LINK_FLAGS "")
+SET(CMAKE_ASM_LINK_FLAGS "")
+
+SET(CMAKE_C_FLAGS "-std=gnu17")
+SET(CMAKE_CXX_FLAGS "-std=c++17 -stdlib=libc++ -fno-rtti -fno-exceptions")
+SET(CMAKE_ASM_FLAGS "")
+
+project(ArduinoBLE)
+
+message("CMAKE_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  add_compile_options(-Wno-format -Wno-gnu-variable-sized-type-not-at-end)
+  SET(PLATFORM_LINKER_FLAGS "-Wl,-dead_strip -Wl,-map,<TARGET>.map -L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  SET(PLATFORM_LINKER_FLAGS "-Wl,-s -Wl,--gc-sections -Wl,--as-needed -Wl,-Map=<TARGET>.map")
+endif()
+
+SET(CMAKE_C_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <OBJECTS> -o <TARGET> ${PLATFORM_LINKER_FLAGS} <LINK_LIBRARIES>")
+SET(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE}")
+
+add_compile_options(-Os -g0 -fstrict-aliasing -ffunction-sections -ffreestanding -fomit-frame-pointer)
+
+include_directories(
+  ArduinoCore-API/api
+  ArduinoCore-Linux/cores/arduino
+  ArduinoCore-Linux/libraries/ArduinoBLE
+)
+
+add_compile_definitions(
+  _BLE_TRACE_
+  DEFINE_MAIN
+  PROVIDE_SERIALLIB
+)
+
+file(GLOB arduino_ble_src CONFIGURE_DEPENDS
+  "main.cpp"
+  "ArduinoCore-API/api/*.cpp"
+  "ArduinoCore-Linux/cores/arduino/*.cpp"
+  "ArduinoCore-Linux/libraries/ArduinoBLE/*.cpp"
+  "ArduinoCore-Linux/libraries/ArduinoBLE/*/*.cpp"
+)
+add_executable(arduino ${arduino_ble_src})
+target_link_libraries(arduino -lstdc++)

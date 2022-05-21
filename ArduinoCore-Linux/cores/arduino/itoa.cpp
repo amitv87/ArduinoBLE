@@ -20,7 +20,7 @@ std::string radixToFmtString(int const radix)
   if      (radix == 8)  return std::string("%o");
   else if (radix == 10) return std::string("%d");
   else if (radix == 16) return std::string("%X");
-  else throw std::runtime_error("Invalid radix.");
+  else return std::string("");
 }
 
 char * itoa(int value, char * str, int radix)

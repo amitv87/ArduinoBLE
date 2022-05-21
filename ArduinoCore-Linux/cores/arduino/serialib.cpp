@@ -157,7 +157,7 @@ char serialib::openDevice(const char *Device,const unsigned int Bauds)
     // Opening successfull
     return 1;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Structure with the device's options
     struct termios options;
 
@@ -190,7 +190,7 @@ char serialib::openDevice(const char *Device,const unsigned int Bauds)
     case 38400 :    Speed=B38400; break;
     case 57600 :    Speed=B57600; break;
     case 115200 :   Speed=B115200; break;
-    default : return -4;
+    // default : return -4;
     }    
     // Set the baud rate
     cfsetispeed(&options, Speed);
@@ -219,7 +219,7 @@ void serialib::closeDevice()
 #if defined (_WIN32) || defined( _WIN64)
     CloseHandle(hSerial);
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     close (fd);
 #endif
 }
@@ -249,7 +249,7 @@ char serialib::writeChar(const char Byte)
     // Write operation successfull
     return 1;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Write the char
     if (write(fd,&Byte,1)!=1) return -1;
 
@@ -282,7 +282,7 @@ char serialib::writeString(const char *receivedString)
     // Write operation successfull
     return 1;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Lenght of the string
     int Lenght=strlen(receivedString);
     // Write the string
@@ -316,7 +316,7 @@ char serialib::writeBytes(const void *Buffer, const unsigned int NbBytes)
     // Write operation successfull
     return 1;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Write data
     if (write (fd,Buffer,NbBytes)!=(ssize_t)NbBytes) return -1;
     // Write operation successfull
@@ -357,7 +357,7 @@ char serialib::readChar(char *pByte,unsigned int timeOut_ms)
     // The byte is read
     return 1;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Timer used for timeout
     timeOut         timer;
     // Initialise the timer
@@ -532,7 +532,7 @@ int serialib::readBytes (void *buffer,unsigned int maxNbBytes,unsigned int timeO
     // Return the byte read
     return dwBytesRead;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Timer used for timeout
     timeOut          timer;
     // Initialise the timer
@@ -584,7 +584,7 @@ char serialib::flushReceiver()
     // Purge receiver
     return PurgeComm (hSerial, PURGE_RXCLEAR);
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Purge receiver
     tcflush(fd,TCIFLUSH);
     return true;
@@ -609,7 +609,7 @@ int serialib::available()
     // Return the number of pending bytes
     return commStatus.cbInQue;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int nBytes=0;
     // Return number of pending bytes in the receiver
     ioctl(fd, FIONREAD, &nBytes);
@@ -656,7 +656,7 @@ bool serialib::setDTR()
     currentStateDTR=true;
     return EscapeCommFunction(hSerial,SETDTR);
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Set DTR
     int status_DTR=0;
     ioctl(fd, TIOCMGET, &status_DTR);
@@ -679,7 +679,7 @@ bool serialib::clearDTR()
     currentStateDTR=true;
     return EscapeCommFunction(hSerial,CLRDTR);
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Clear DTR
     int status_DTR=0;
     ioctl(fd, TIOCMGET, &status_DTR);
@@ -724,7 +724,7 @@ bool serialib::setRTS()
     currentStateRTS=false;
     return EscapeCommFunction(hSerial,SETRTS);
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Set RTS
     int status_RTS=0;
     ioctl(fd, TIOCMGET, &status_RTS);
@@ -749,7 +749,7 @@ bool serialib::clearRTS()
     currentStateRTS=false;
     return EscapeCommFunction(hSerial,CLRRTS);
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     // Clear RTS
     int status_RTS=0;
     ioctl(fd, TIOCMGET, &status_RTS);
@@ -774,7 +774,7 @@ bool serialib::isCTS()
     GetCommModemStatus(hSerial, &modemStat);
     return modemStat & MS_CTS_ON;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int status=0;
     //Get the current status of the CTS bit
     ioctl(fd, TIOCMGET, &status);
@@ -796,7 +796,7 @@ bool serialib::isDSR()
     GetCommModemStatus(hSerial, &modemStat);
     return modemStat & MS_DSR_ON;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int status=0;
     //Get the current status of the DSR bit
     ioctl(fd, TIOCMGET, &status);
@@ -822,7 +822,7 @@ bool serialib::isDCD()
     GetCommModemStatus(hSerial, &modemStat);
     return modemStat & MS_RLSD_ON;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int status=0;
     //Get the current status of the DCD bit
     ioctl(fd, TIOCMGET, &status);
@@ -843,7 +843,7 @@ bool serialib::isRI()
     GetCommModemStatus(hSerial, &modemStat);
     return modemStat & MS_RING_ON;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int status=0;
     //Get the current status of the RING bit
     ioctl(fd, TIOCMGET, &status);
@@ -863,7 +863,7 @@ bool serialib::isDTR()
 #if defined (_WIN32) || defined( _WIN64)
     return currentStateDTR;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int status=0;
     //Get the current status of the DTR bit
     ioctl(fd, TIOCMGET, &status);
@@ -884,7 +884,7 @@ bool serialib::isRTS()
 #if defined (_WIN32) || defined(_WIN64)
     return currentStateRTS;
 #endif
-#ifdef __linux__
+#if defined __linux__ || __APPLE__
     int status=0;
     //Get the current status of the CTS bit
     ioctl(fd, TIOCMGET, &status);

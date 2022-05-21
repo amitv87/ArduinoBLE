@@ -50,6 +50,7 @@ class SerialImpl : public HardwareSerial {
             } else {
                 char c;
                 result = serial.readChar(&c, timeout);
+                result = result == 1 ? c : -1;
             }
             return result;
         };
@@ -79,8 +80,11 @@ class SerialImpl : public HardwareSerial {
         long timeout = 1000;
 
         virtual void open(unsigned long baudrate) {
-            if (!serial.openDevice(device, baudrate)){
-                Logger.error("SerialImpl","could not open",device);
+            if(is_open) return;
+            int rc = serial.openDevice(device, baudrate);
+            printf("openDevice %s -> %d\r\n", device, rc);
+
+            if (serial.openDevice(device, baudrate) != 1){
             }
             is_open=true;
         }
